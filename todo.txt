@@ -7,3 +7,4 @@
 7) Refactor project to follow MVC architecture
     - https://plainenglish.io/blog/flask-crud-application-using-mvc-architecture
 8) Unit Testing for Flask components
+9) Add doc-strings for functions
