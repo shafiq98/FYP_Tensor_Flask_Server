@@ -3,3 +3,7 @@
 3) Create method to insert this incoming data to pandas DataFrame
 4) Create ongoing tracker that keeps track of changes to Pandas DataFrame
 5) Create method to trigger learning once enough data has been inserted into the Pandas DataFrame
+6) Refactor project to separate tensorflow methods from web server
+7) Refactor project to follow MVC architecture
+    - https://plainenglish.io/blog/flask-crud-application-using-mvc-architecture
+8) Unit Testing for Flask components
