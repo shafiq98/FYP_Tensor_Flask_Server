@@ -6,7 +6,8 @@ from flask import Flask, jsonify, request
 # SQL Imports
 
 # Local Packages Import
-from neural_network_functions import base as base_tf
+from neural_network_functions import tensor_functions as custom_tf
+from Service import DataManager as dm
 
 '''
 https://github.com/Joy2469/Deep-Learning-MNIST---Handwritten-Digit-Recognition/blob/master/digit_Recognition_CNN.py
@@ -22,10 +23,6 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()]
 )
 log = logging.getLogger(__name__)
-
-
-# log.debug("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-# log.debug(device_lib.list_local_devices())
 
 @app.route("/", methods=[POST])
 def receive_training_data():
@@ -45,11 +42,10 @@ def receive_training_data():
 if __name__ == "__main__":
     # app.run(host='0.0.0.0', port=8080, debug=True)
 
-    (X_train, y_train), (X_test, y_test) = base_tf.initialize_data()
-    train_df, test_df = base_tf.generate_dataframe(X_train, y_train, X_test, y_test)
-    (reconstructed_x_train, reconstructed_y_train), (
-        reconstructed_x_test, reconstructed_y_test) = base_tf.generate_mnist_tuples(train_df, test_df)
-    model = base_tf.create_model()
+    (X_train, y_train), (X_test, y_test) = custom_tf.initialize_data()
+    train_df, test_df = dm.generate_dataframes(X_train, y_train, X_test, y_test)
+    reconstructed_x_train, reconstructed_y_train, reconstructed_x_test, reconstructed_y_test = dm.generate_mnist_tuples(train_df, test_df)
+    model = custom_tf.create_model()
     model.fit(reconstructed_x_train, reconstructed_y_train,
               validation_data=(reconstructed_x_test, reconstructed_y_test), epochs=10,
               batch_size=200)
