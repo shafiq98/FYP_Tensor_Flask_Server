@@ -1,0 +1,5 @@
+1) Create Flask Controller Method to accept incoming data and pass it to a verification system
+2) Create a verification method that ensures incoming data is of expected dimensions
+3) Create method to insert this incoming data to pandas DataFrame
+4) Create ongoing tracker that keeps track of changes to Pandas DataFrame
+5) Create method to trigger learning once enough data has been inserted into the Pandas DataFrame
