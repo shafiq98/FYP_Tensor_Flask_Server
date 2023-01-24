@@ -51,10 +51,10 @@ def generate_dataframe(x_data: tuple, y_data: tuple, should_log: bool = False) -
         :type y_data: nested tuple of prediction
         :returns: df
         :type df: pd.DataFrame
-    TODO:
-        Modify this to use SQL DB instead, and return an SQL Connection object
+    TODO: Modify this to use SQL DB instead, and return an SQL Connection object
     """
     # TODO: Find a way to refactor this for loop to be quicker
+    # TODO: Modify this to use SQL DB instead, and return an SQL Connection object
     df = pd.DataFrame(columns=["PixelArray", "Result"])
     for image in range(0, len(x_data)):
         dict_row = {"PixelArray": [x_data[image]], "Result": [y_data[image]]}
@@ -72,13 +72,12 @@ def generate_dataframe(x_data: tuple, y_data: tuple, should_log: bool = False) -
 def generate_mnist_tuples(train_df: pd.DataFrame, test_df: pd.DataFrame) -> (np.array, np.array, np.array, np.array):
     """
     Returns incoming 2 different dataframes as nested tuples
-            Parameters:
-                    :param train_df:
-                    :tyoe train_df: pd.DataFrame
-                    :param test_df:
-                    :type test_df: pd.DataFrame
-            Returns:
-                    (reconstructed_x_train, reconstructed_y_train), (reconstructed_x_test, reconstructed_y_test): 4 nested tuples, in the same format as initialize data
+        :param train_df: Training Dataframe that needs to be converted to 2 training tuples
+        :type train_df: pd.DataFrame
+        :param test_df: Testing Dataframe that needs to be converted to 2 testing tuples
+        :type test_df: pd.DataFrame
+        :returns (reconstructed_x_train, reconstructed_y_train), (reconstructed_x_test, reconstructed_y_test)
+        :rtype: np.array
     """
     reconstructed_x_train = train_df["PixelArray"].to_numpy().tolist()
     reconstructed_x_test = test_df["PixelArray"].to_numpy().tolist()
