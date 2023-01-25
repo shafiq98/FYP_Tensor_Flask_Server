@@ -51,7 +51,6 @@ def generate_dataframe(x_data: tuple, y_data: tuple, should_log: bool = False) -
         :type y_data: nested tuple of prediction
         :returns: df
         :type df: pd.DataFrame
-    TODO: Modify this to use SQL DB instead, and return an SQL Connection object
     """
     # TODO: Find a way to refactor this for loop to be quicker
     # TODO: Modify this to use SQL DB instead, and return an SQL Connection object
@@ -65,6 +64,8 @@ def generate_dataframe(x_data: tuple, y_data: tuple, should_log: bool = False) -
         log.debug("Number of training rows = {}".format(len(df)))
         log.debug("Number of nested arrays = {}".format(len(df.loc[0]["PixelArray"])))
         log.debug("Length of inner array = {}".format(len(df.loc[0]["PixelArray"][0])))
+        log.debug("y data sample = {}".format(len(df.loc[0]["Result"])))
+        # log.debug("y data sample = {}".format(len(df.loc[0]["Result"][0])))
 
     return df
 
@@ -94,4 +95,37 @@ def generate_mnist_tuples(train_df: pd.DataFrame, test_df: pd.DataFrame) -> (np.
 
     # Return everything as np.array due to type expectation of TensorFlow training method
     # https://stackoverflow.com/questions/65474081/valueerror-data-cardinality-is-ambiguous-make-sure-all-arrays-contain-the-same
-    return np.array(reconstructed_x_train), np.array(reconstructed_y_train), np.array(reconstructed_x_test), np.array(reconstructed_y_test)
+    reconstructed_x_train = np.array(reconstructed_x_train)
+    reconstructed_y_train = np.array(reconstructed_y_train)
+    reconstructed_x_test = np.array(reconstructed_x_test)
+    reconstructed_y_test = np.array(reconstructed_y_test)
+    return reconstructed_x_train, reconstructed_y_train, reconstructed_x_test, reconstructed_y_test
+
+
+def string_to_dataframe_row(incoming_data: str) -> dict:
+    # strip unnecessary characters
+    incoming_data.replace('\n', '')
+    incoming_data.replace(' ', '')
+
+    # change string to float array
+    str_array = incoming_data.split(",")
+    float_array = list(map(float, str_array))
+
+    # remove digit expectation (0-9) from training data (28x28 array)
+    training_data = float_array[:-1]
+    expectation = float_array[-1]
+
+    # one-hot encode expectation
+    one_hot_array = manual_one_hot_encode(expectation, 10)
+
+    nested_training_data = np.reshape(training_data, (28, 28, 1)).astype('float32')
+
+    dict_row = {"PixelArray": nested_training_data, "Result": one_hot_array}
+
+    return dict_row
+
+
+def manual_one_hot_encode(result: float, length: int) -> list:
+    one_hot_array = [0.0] * length
+    one_hot_array[int(result)] = 1.0
+    return one_hot_array

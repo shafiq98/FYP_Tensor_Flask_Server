@@ -55,7 +55,7 @@ def initialize_data():
     return (x_train, y_train), (x_test, y_test)
 
 
-def create_model() -> Sequential:
+def create_model(is_high_performance: bool = False) -> Sequential:
     '''
     Creates neural network model
     :return: 5 Layer CNN Model
@@ -67,9 +67,10 @@ def create_model() -> Sequential:
     # relu: rectified linear unit activation function
     model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', input_shape=(28, 28, 1)))
     model.add(MaxPooling2D((2, 2)))
-    model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform'))
-    model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform'))
-    model.add(MaxPooling2D((2, 2)))
+    if is_high_performance:
+        model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform'))
+        model.add(Conv2D(64, (3, 3), activation='relu', kernel_initializer='he_uniform'))
+        model.add(MaxPooling2D((2, 2)))
     model.add(Flatten())
     model.add(Dense(100, activation='relu', kernel_initializer='he_uniform'))
     model.add(Dense(10, activation='softmax'))
@@ -96,3 +97,25 @@ def test(x_train, model):
         plt.imshow(org_image, cmap=plt.get_cmap('gray'))
 
     plt.show()
+
+
+def export(model: Sequential) -> None:
+    # serialize model to JSON
+    model_json = model.to_json()
+    with open("model.json", "w") as json_file:
+        json_file.write(model_json)
+
+    """
+    TODO: Modify this method to export a TFLite file, and a C char array to a text file/c file
+    Possible Resources
+    1. Model Format Overview:   https://www.tensorflow.org/lite/models/convert
+    2. Model Conversion:        https://www.tensorflow.org/lite/models/convert/convert_models
+    3. C++ Model File:          https://www.tensorflow.org/lite/microcontrollers/build_convert
+    4. xxd command explanation: https://www.tutorialspoint.com/unix_commands/xxd.htm
+    5. Stack Overflow Solution: https://stackoverflow.com/questions/6624453/whats-the-correct-way-to-convert-bytes-to-a-hex-string-in-python-3
+    """
+
+    # serialize weights to HDF5
+    model.save_weights("model.h5")
+    log.info("Saved model to disk")
+    return
