@@ -5,6 +5,7 @@ from flask import Flask, jsonify, request
 
 # # SQL Imports
 # # Local Packages Import
+from Service import ModelService as ms
 
 '''
 https://github.com/Joy2469/Deep-Learning-MNIST---Handwritten-Digit-Recognition/blob/master/digit_Recognition_CNN.py
@@ -21,7 +22,7 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-@app.route("/", methods=[POST])
+@app.route("/train", methods=[POST])
 def receive_training_data():
     divider = "================================================================"
     incoming_data_raw = request.data.decode("utf-8")
@@ -34,6 +35,11 @@ def receive_training_data():
             "status": 200
         }
     )
+
+@app.route("/model", methods=[GET])
+def send_model():
+    response_array = ms.load_model(r"..\resources\original_model.txt")
+    return response_array
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8080, debug=True)

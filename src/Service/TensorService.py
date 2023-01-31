@@ -106,8 +106,9 @@ def test(x_train, model):
 def export(model: Sequential) -> None:
     # serialize model to JSON
     model_json = model.to_json()
-    with open("model.json", "w") as json_file:
-        json_file.write(model_json)
+    with open("model.json", "w") as json_file_writable:
+        json_file_writable.write(model_json)
+        json_file_writable.close()
 
     log.debug(json.dumps(model_json, indent=4))
 
@@ -124,4 +125,38 @@ def export(model: Sequential) -> None:
     # serialize weights to HDF5
     model.save_weights("model.h5")
     log.info("Saved model to disk")
+
+    # serialize model to tflite
+    converter = tf.lite.TFLiteConverter.from_keras_model(model)
+    tflite_model = converter.convert()
+
+    # Save the model.
+    with open('model.tflite', 'wb') as tf_lite_writable:
+        tf_lite_writable.write(tflite_model)
+        tf_lite_writable.close()
+
+    with open(file='model.tflite', mode='rb') as tf_lite_readable, open('test.txt', 'w+') as c_array_writable:
+        log.debug("TFLite Model: {}".format(tf_lite_readable))
+        # log.debug(f.read())
+        hex_array = [hex(i) for i in tf_lite_readable.read()]
+        # hex_array = hex_array[-5:]
+        log.debug("Last {} characters of hex_array = {}".format(5, hex_array[-5:]))
+        log.debug("Length of hex_array = {}".format(len(hex_array)))
+
+        hex_array_stringified = ", ".join(hex_array)
+
+        # declaration_str1 = "unsigned char model_tflite[] = {"
+        # c_array_writable.write(declaration_str1)
+
+        c_array_writable.write(hex_array_stringified)
+
+        # closing_str = "};\n"
+        # c_array_writable.write(closing_str)
+        #
+        # model_length_str = "unsigned int model_tflite_len = {};".format(len(hex_array))
+        # c_array_writable.write(model_length_str)
+
+        tf_lite_readable.close()
+        c_array_writable.close()
+
     return

@@ -67,15 +67,15 @@ class DataFrameHandler(unittest.TestCase):
         #           validation_data=(reconstructed_x_test, reconstructed_y_test), epochs=10,
         #           batch_size=200)
 
-        log.debug("trainingDf.loc[0]: {}".format(self.trainingDf.loc[0]["PixelArray"]))
-        log.debug("trainingDf.loc[0] length: {}".format(len(self.trainingDf.loc[0]["PixelArray"])))
-        log.debug("trainingDf.loc[0][0]: {}".format(self.trainingDf.loc[0]["PixelArray"][0]))
-        log.debug("trainingDf.loc[0][0] type: {}".format(type(self.trainingDf.loc[0]["PixelArray"][0])))
-
-        log.debug("df_row: {}".format(dict_row.get("PixelArray")))
-        log.debug("df_row[PixelArray] length: {}".format(len(dict_row.get("PixelArray"))))
-        log.debug("df_row[PixelArray][0]: {}".format(dict_row.get("PixelArray")[0]))
-        log.debug("df_row[PixelArray][0] type: {}".format(type(dict_row.get("PixelArray")[0])))
+        # log.debug("trainingDf.loc[0]: {}".format(self.trainingDf.loc[0]["PixelArray"]))
+        # log.debug("trainingDf.loc[0] length: {}".format(len(self.trainingDf.loc[0]["PixelArray"])))
+        # log.debug("trainingDf.loc[0][0]: {}".format(self.trainingDf.loc[0]["PixelArray"][0]))
+        # log.debug("trainingDf.loc[0][0] type: {}".format(type(self.trainingDf.loc[0]["PixelArray"][0])))
+        #
+        # log.debug("df_row: {}".format(dict_row.get("PixelArray")))
+        # log.debug("df_row[PixelArray] length: {}".format(len(dict_row.get("PixelArray"))))
+        # log.debug("df_row[PixelArray][0]: {}".format(dict_row.get("PixelArray")[0]))
+        # log.debug("df_row[PixelArray][0] type: {}".format(type(dict_row.get("PixelArray")[0])))
 
         self.trainingDf = self.trainingDf.append(dict_row, ignore_index=True)
 
@@ -85,6 +85,6 @@ class DataFrameHandler(unittest.TestCase):
         model.fit(reconstructed_x_train, reconstructed_y_train,
                   validation_data=(reconstructed_x_test, reconstructed_y_test), epochs=10,
                   batch_size=200)
-        custom_tf.test(self.X_train, model)
+        # custom_tf.test(self.X_train, model)
 
         custom_tf.export(model)
