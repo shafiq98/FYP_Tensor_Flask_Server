@@ -56,6 +56,7 @@ def generate_dataframe(x_data: tuple, y_data: tuple, should_log: bool = False) -
     # TODO: Modify this to use SQL DB instead, and return an SQL Connection object
     df = pd.DataFrame(columns=["PixelArray", "Result"])
     for image in range(0, len(x_data)):
+    # for image in range(0, 20):
         dict_row = {"PixelArray": [x_data[image]], "Result": [y_data[image]]}
         df_row = pd.DataFrame(dict_row)
         df = pd.concat([df, df_row], ignore_index=True)

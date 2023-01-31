@@ -1,3 +1,4 @@
+import json
 import logging
 
 # TensorFlow imports
@@ -16,7 +17,7 @@ from keras.utils import np_utils
 from matplotlib import pyplot
 from sklearn.model_selection import KFold
 import tensorflow as tf
-from tensorflow.python.keras import Sequential
+# from tensorflow.python.keras import Sequential
 from tensorflow.python.client import device_lib
 
 # from tensorflow.python.keras.optimizers import SGD
@@ -88,12 +89,15 @@ def test(x_train, model):
     for i, test_image in enumerate(test_images, start=1):
         org_image = test_image
         test_image = test_image.reshape(1, 28, 28, 1)
-        prediction = model.predict_classes(test_image, verbose=0)
+        # prediction = model.predict_classes(test_image, verbose=0)
+        prediction = model(test_image)
 
-        print("Predicted digit: {}".format(prediction[0]))
+        log.debug("Predicted digit: {}".format(prediction[0]))
+        log.debug("Predicted digit: {}".format(np.argmax(prediction[0])))
+        log.debug("Prediction Confidence: {}".format(prediction[0][np.argmax(prediction[0])]))
         plt.subplot(220 + i)
         plt.axis('off')
-        plt.title("Predicted digit: {}".format(prediction[0]))
+        plt.title("Predicted digit: {}".format(np.argmax(prediction[0])))
         plt.imshow(org_image, cmap=plt.get_cmap('gray'))
 
     plt.show()
@@ -104,6 +108,8 @@ def export(model: Sequential) -> None:
     model_json = model.to_json()
     with open("model.json", "w") as json_file:
         json_file.write(model_json)
+
+    log.debug(json.dumps(model_json, indent=4))
 
     """
     TODO: Modify this method to export a TFLite file, and a C char array to a text file/c file
