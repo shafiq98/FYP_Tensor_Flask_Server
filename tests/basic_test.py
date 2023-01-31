@@ -4,8 +4,7 @@ import os
 
 import pandas as pd
 
-from src.Service import DataManager as dm
-from src.neural_network_functions import tensor_functions as custom_tf
+from src.Service import DataManager as dm, TensorService as custom_tf
 
 logging.basicConfig(
     level=logging.DEBUG,
