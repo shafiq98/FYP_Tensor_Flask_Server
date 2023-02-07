@@ -28,3 +28,28 @@ def load_model(path: str, shouldLog:bool = False) -> list:
         log.debug("hex_array element type: {}".format(type(hex_array[0])))
 
     return hex_array
+
+def model_export():
+    with open(file='model.tflite', mode='rb') as tf_lite_readable, open('test.txt', 'w+') as c_array_writable:
+        log.debug("TFLite Model: {}".format(tf_lite_readable))
+        # log.debug(f.read())
+        hex_array = [hex(i) for i in tf_lite_readable.read()]
+        # hex_array = hex_array[-5:]
+        log.debug("Last {} characters of hex_array = {}".format(5, hex_array[-5:]))
+        log.debug("Length of hex_array = {}".format(len(hex_array)))
+
+        hex_array_stringified = ", ".join(hex_array)
+
+        # declaration_str1 = "unsigned char model_tflite[] = {"
+        # c_array_writable.write(declaration_str1)
+
+        c_array_writable.write(hex_array_stringified)
+
+        # closing_str = "};\n"
+        # c_array_writable.write(closing_str)
+        #
+        # model_length_str = "unsigned int model_tflite_len = {};".format(len(hex_array))
+        # c_array_writable.write(model_length_str)
+
+        tf_lite_readable.close()
+        c_array_writable.close()

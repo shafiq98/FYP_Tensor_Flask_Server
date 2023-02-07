@@ -103,10 +103,10 @@ def test(x_train, model):
     plt.show()
 
 
-def export(model: Sequential) -> None:
+def export(model: Sequential, c_file:bool = False) -> None:
     # serialize model to JSON
     model_json = model.to_json()
-    with open("model.json", "w") as json_file_writable:
+    with open(r"..\resources\model.json", "w") as json_file_writable:
         json_file_writable.write(model_json)
         json_file_writable.close()
 
@@ -131,11 +131,17 @@ def export(model: Sequential) -> None:
     tflite_model = converter.convert()
 
     # Save the model.
-    with open('model.tflite', 'wb') as tf_lite_writable:
+    with open(r"..\resources\model.tflite", 'wb') as tf_lite_writable:
         tf_lite_writable.write(tflite_model)
         tf_lite_writable.close()
 
-    with open(file='model.tflite', mode='rb') as tf_lite_readable, open('test.txt', 'w+') as c_array_writable:
+    target_file_name = None
+    if c_file:
+        target_file_name = "model.cpp"
+    else:
+        target_file_name = "text.txt"
+
+    with open(file=r'..\resources\model.tflite', mode='rb') as tf_lite_readable, open(r'..\resources\{}'.format(target_file_name), 'w+') as c_array_writable:
         log.debug("TFLite Model: {}".format(tf_lite_readable))
         # log.debug(f.read())
         hex_array = [hex(i) for i in tf_lite_readable.read()]
@@ -145,16 +151,16 @@ def export(model: Sequential) -> None:
 
         hex_array_stringified = ", ".join(hex_array)
 
-        # declaration_str1 = "unsigned char model_tflite[] = {"
-        # c_array_writable.write(declaration_str1)
+        declaration_str1 = "unsigned char model_tflite[] = {"
+        c_array_writable.write(declaration_str1)
 
         c_array_writable.write(hex_array_stringified)
 
-        # closing_str = "};\n"
-        # c_array_writable.write(closing_str)
-        #
-        # model_length_str = "unsigned int model_tflite_len = {};".format(len(hex_array))
-        # c_array_writable.write(model_length_str)
+        closing_str = "};\n"
+        c_array_writable.write(closing_str)
+
+        model_length_str = "unsigned int model_tflite_len = {};".format(len(hex_array))
+        c_array_writable.write(model_length_str)
 
         tf_lite_readable.close()
         c_array_writable.close()
