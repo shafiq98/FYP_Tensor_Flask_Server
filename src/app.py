@@ -1,7 +1,7 @@
 import logging
 
 # Web Server Imports
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 
 # # SQL Imports
 # # Local Packages Import
@@ -38,8 +38,9 @@ def receive_training_data():
 
 @app.route("/model", methods=[GET])
 def send_model():
-    response_array = ms.load_model(r"..\resources\original_model.txt")
-    return response_array
+    # response_array = ms.load_model(r"..\resources\original_model.txt")
+    # return response_array
+    return send_file(r"..\resources\model.cpp")
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8080, debug=True)
