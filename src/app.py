@@ -2,6 +2,7 @@ import logging
 
 # Web Server Imports
 from flask import Flask, jsonify, request, send_file
+import requests
 
 # # SQL Imports
 # # Local Packages Import
@@ -42,8 +43,15 @@ def send_model():
     # return response_array
     return send_file(r"..\resources\model.cpp")
 
+# temporary method to send model to zephyr server
+def send_model():
+    test_file = open(r"..\resources\model.cpp", "rb")
+    BASE_URL = "http://localhost:8081/retrieve_model"
+    test_response = requests.post(BASE_URL, files={"model": test_file})
+    test_file.close()
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    # app.run(host='0.0.0.0', port=8080, debug=True)
 
     # (X_train, y_train), (X_test, y_test) = custom_tf.initialize_data()
     # train_df, test_df = dm.generate_dataframes(X_train, y_train, X_test, y_test)
@@ -53,4 +61,5 @@ if __name__ == "__main__":
     #           validation_data=(reconstructed_x_test, reconstructed_y_test), epochs=10,
     #           batch_size=200)
     # custom_tf.test(X_train, model)
+    send_model()
 
