@@ -3,6 +3,7 @@ import logging
 # Web Server Imports
 import os
 
+import pandas as pd
 from flask import Flask, jsonify, request
 import requests
 
@@ -31,6 +32,9 @@ log = logging.getLogger(__name__)
 (x_train, y_train), (x_test, y_test) = ts.initialize_data()
 (train_df, test_df) = ds.generate_dataframes(x_train, y_train, x_test, y_test)
 
+# train_df = pd.DataFrame()
+# test_df = pd.DataFrame()
+
 @app.route("/train", methods=[POST])
 def receive_training_data():
     log.debug("================================================================")
@@ -40,9 +44,12 @@ def receive_training_data():
     # log.debug(incoming_data_raw)
 
     ds.receive_training_data_service(train_df, test_df, data)
-    log.debug("================================================================")
+    log.debug("Received Data Successfully")
 
     # trigger training based on condition like loop counter or simply schedule daily training
+    x_train, y_train, x_test, y_test = ds.generate_mnist_tuples(train_df, test_df)
+    ts.model_service(x_train, y_train, x_test, y_test)
+    log.debug("================================================================")
 
     return jsonify(
         {

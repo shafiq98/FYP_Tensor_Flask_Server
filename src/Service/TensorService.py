@@ -34,7 +34,18 @@ log.debug("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 log.debug(device_lib.list_local_devices())
 
 
-# TensorFlow Functions
+# TensorFlow Service Functions
+def model_service(x_train, y_train, x_test, y_test) -> Sequential:
+    model: Sequential = create_model(True)
+    log.debug("Running model training")
+    model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=10, batch_size=32)
+    log.debug("Training complete!")
+    export(model, c_file=True)
+
+    return model
+
+
+# TensorFlow Helper Functions
 def initialize_data():
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
@@ -103,14 +114,14 @@ def test(x_train, model):
     plt.show()
 
 
-def export(model: Sequential, c_file:bool = False) -> None:
-    # serialize model to JSON
+def export(model: Sequential, c_file: bool = False) -> None:
+    log.debug("Serialize model to {} format in progress...".format("JSON"))
     model_json = model.to_json()
     with open(r"..\resources\model.json", "w") as json_file_writable:
         json_file_writable.write(model_json)
         json_file_writable.close()
-
-    log.debug(json.dumps(model_json, indent=4))
+    # log.debug(json.dumps(model_json, indent=4))
+    log.debug("Serialize model to {} successful!".format("JSON"))
 
     """
     TODO: Modify this method to export a TFLite file, and a C char array to a text file/c file
@@ -122,10 +133,13 @@ def export(model: Sequential, c_file:bool = False) -> None:
     5. Stack Overflow Solution: https://stackoverflow.com/questions/6624453/whats-the-correct-way-to-convert-bytes-to-a-hex-string-in-python-3
     """
 
+    log.debug("Serialize model to {} format in progress...".format("HDF5"))
     # serialize weights to HDF5
-    model.save_weights("model.h5")
+    model.save_weights(r"..\resources\model.h5")
     log.info("Saved model to disk")
+    log.debug("Serialize model to {} successful!".format("HDF5"))
 
+    log.debug("Serialize model to {} format in progress...".format("tflite"))
     # serialize model to tflite
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
     tflite_model = converter.convert()
@@ -134,20 +148,24 @@ def export(model: Sequential, c_file:bool = False) -> None:
     with open(r"..\resources\model.tflite", 'wb') as tf_lite_writable:
         tf_lite_writable.write(tflite_model)
         tf_lite_writable.close()
+    log.debug("Serialize model to {} successful!".format("tflite"))
 
     target_file_name = None
     if c_file:
+        log.debug("Serialize model to {} format in progress...".format("cpp"))
         target_file_name = "model.cpp"
     else:
+        log.debug("Serialize model to {} format in progress...".format("txt"))
         target_file_name = "model.txt"
 
-    with open(file=r'..\resources\model.tflite', mode='rb') as tf_lite_readable, open(r'..\resources\{}'.format(target_file_name), 'w+') as c_array_writable:
-        log.debug("TFLite Model: {}".format(tf_lite_readable))
+    with open(file=r'..\resources\model.tflite', mode='rb') as tf_lite_readable, open(
+            r'..\resources\{}'.format(target_file_name), 'w+') as c_array_writable:
+        # log.debug("TFLite Model: {}".format(tf_lite_readable))
         # log.debug(f.read())
         hex_array = [hex(i) for i in tf_lite_readable.read()]
         # hex_array = hex_array[-5:]
-        log.debug("Last {} characters of hex_array = {}".format(5, hex_array[-5:]))
-        log.debug("Length of hex_array = {}".format(len(hex_array)))
+        # log.debug("Last {} characters of hex_array = {}".format(5, hex_array[-5:]))
+        # log.debug("Length of hex_array = {}".format(len(hex_array)))
 
         hex_array_stringified = ", ".join(hex_array)
 
@@ -164,5 +182,10 @@ def export(model: Sequential, c_file:bool = False) -> None:
 
         tf_lite_readable.close()
         c_array_writable.close()
+
+    if c_file:
+        log.debug("Serialize model to {} successful!".format("cpp"))
+    else:
+        log.debug("Serialize model to {} successful!".format("txt"))
 
     return

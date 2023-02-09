@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 
 # service method
-def receive_training_data_service(train_df: pd.DataFrame, test_df: pd.DataFrame, incoming_data: str):
+def receive_training_data_service(train_df: pd.DataFrame, test_df: pd.DataFrame, incoming_data: str) -> (pd.DataFrame, pd.DataFrame):
     log.debug("Convert incoming string to dataframe row (dictionary type)")
     row: dict = string_to_dataframe_row(incoming_data)
 
