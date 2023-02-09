@@ -37,12 +37,6 @@ def receive_training_data():
         }
     )
 
-@app.route("/model", methods=[GET])
-def send_model():
-    # response_array = ms.load_model(r"..\resources\original_model.txt")
-    # return response_array
-    return send_file(r"..\resources\model.cpp")
-
 # temporary method to send model to zephyr server
 def send_model():
     test_file = open(r"..\resources\model.cpp", "rb")
