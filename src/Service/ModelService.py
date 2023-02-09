@@ -30,7 +30,7 @@ def load_model(path: str, shouldLog:bool = False) -> list:
     return hex_array
 
 def model_export():
-    with open(file='model.tflite', mode='rb') as tf_lite_readable, open('test.txt', 'w+') as c_array_writable:
+    with open(file='model.tflite', mode='rb') as tf_lite_readable, open('model.txt', 'w+') as c_array_writable:
         log.debug("TFLite Model: {}".format(tf_lite_readable))
         # log.debug(f.read())
         hex_array = [hex(i) for i in tf_lite_readable.read()]

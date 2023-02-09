@@ -139,7 +139,7 @@ def export(model: Sequential, c_file:bool = False) -> None:
     if c_file:
         target_file_name = "model.cpp"
     else:
-        target_file_name = "text.txt"
+        target_file_name = "model.txt"
 
     with open(file=r'..\resources\model.tflite', mode='rb') as tf_lite_readable, open(r'..\resources\{}'.format(target_file_name), 'w+') as c_array_writable:
         log.debug("TFLite Model: {}".format(tf_lite_readable))
