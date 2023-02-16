@@ -51,7 +51,7 @@ def receive_training_data():
         log.debug("We have collected an additional {} samples, starting training now".format(LEARNING_TRIGGER))
         x_train, y_train, x_test, y_test = DS.generate_mnist_tuples(train_df, test_df)
         TS.model_service(x_train, y_train, x_test, y_test)
-        # send_model()
+        send_model()
         totalLength = updatedLength
     log.debug("================================================================")
 
