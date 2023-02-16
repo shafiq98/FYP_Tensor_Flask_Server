@@ -45,4 +45,10 @@ class DataFrameHandler(unittest.TestCase):
         custom_tf.export(self.model)
 
     def test_cFileCreation(self):
+        reconstructed_x_train, reconstructed_y_train, reconstructed_x_test, reconstructed_y_test = dm.generate_mnist_tuples(
+            self.trainingDf, self.test_df)
+        self.model = custom_tf.create_model()
+        self.model.fit(reconstructed_x_train, reconstructed_y_train,
+                       validation_data=(reconstructed_x_test, reconstructed_y_test), epochs=10,
+                       batch_size=200)
         custom_tf.export(self.model, c_file=True)
