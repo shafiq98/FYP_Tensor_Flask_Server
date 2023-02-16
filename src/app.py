@@ -1,20 +1,15 @@
 import logging
 
+# Local Packages Import
+from Service import DataService as DS
+from Service import TensorService as TS
+from Utilities.Constants import LEARNING_TRIGGER
+
 # Web Server Imports
-import os
-
-import pandas as pd
-from flask import Flask, jsonify, request
 import requests
-
-# # SQL Imports
-# # Local Packages Import
-from Service import ModelService as ms
-from Service import DataService as ds
-from Service import TensorService as ts
-
+from flask import Flask, jsonify, request
 '''
-https://github.com/Joy2469/Deep-Learning-MNIST---Handwritten-Digit-Recognition/blob/master/digit_Recognition_CNN.py
+CNN from: https://github.com/Joy2469/Deep-Learning-MNIST---Handwritten-Digit-Recognition/blob/master/digit_Recognition_CNN.py
 '''
 
 app = Flask(__name__)
@@ -29,9 +24,9 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # initialize dataframes for training purpose
-(x_train, y_train), (x_test, y_test) = ts.initialize_data()
-(train_df, test_df) = ds.generate_dataframes(x_train, y_train, x_test, y_test)
-
+(x_train, y_train), (x_test, y_test) = TS.initialize_data()
+(train_df, test_df) = DS.generate_dataframes(x_train, y_train, x_test, y_test)
+totalLength = len(train_df) + len(test_df)
 # train_df = pd.DataFrame()
 # test_df = pd.DataFrame()
 
@@ -43,17 +38,26 @@ def receive_training_data():
     # log.debug("Decoded Data Length = {}".format(len(incoming_data_raw)))
     # log.debug(incoming_data_raw)
 
-    ds.receive_training_data_service(train_df, test_df, data)
+    global train_df, test_df, totalLength
+    LEARNING_TRIGGER = 100
+
+    (train_df, test_df) = DS.receive_training_data_service(train_df, test_df, data)
     log.debug("Received Data Successfully")
 
     # trigger training based on condition like loop counter or simply schedule daily training
-    x_train, y_train, x_test, y_test = ds.generate_mnist_tuples(train_df, test_df)
-    ts.model_service(x_train, y_train, x_test, y_test)
+    updatedLength = len(train_df) + len(test_df)
+    log.debug("Updated Length = {}".format(updatedLength))
+    if (updatedLength - totalLength >= LEARNING_TRIGGER) :
+        log.debug("We have collected an additional {} samples, starting training now".format(LEARNING_TRIGGER))
+        x_train, y_train, x_test, y_test = DS.generate_mnist_tuples(train_df, test_df)
+        TS.model_service(x_train, y_train, x_test, y_test)
+        # send_model()
+        totalLength = updatedLength
     log.debug("================================================================")
 
     return jsonify(
         {
-            "message": "Placeholder Text for proper Response",
+            "message": "Data received successfully!",
             "status": 200
         }
     )

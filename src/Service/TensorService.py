@@ -1,26 +1,15 @@
-import json
 import logging
 
-# TensorFlow imports
-import pandas as pd
-import numpy as np
-
-from keras.datasets import mnist
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D, MaxPooling2D, MaxPool2D
-from keras import backend as K
 import matplotlib.pyplot as plt
-
-# the data, split between train and test sets
-from keras.utils import np_utils
-from matplotlib import pyplot
-from sklearn.model_selection import KFold
+# TensorFlow imports
+import numpy as np
 import tensorflow as tf
-# from tensorflow.python.keras import Sequential
+from keras.datasets import mnist
+from keras.layers import Conv2D, MaxPooling2D
+from keras.layers import Dense, Flatten
+from keras.models import Sequential
+from keras.utils import np_utils
 from tensorflow.python.client import device_lib
-
-# from tensorflow.python.keras.optimizers import SGD
 
 # SETUP
 logging.basicConfig(
@@ -36,7 +25,7 @@ log.debug(device_lib.list_local_devices())
 
 # TensorFlow Service Functions
 def model_service(x_train, y_train, x_test, y_test) -> Sequential:
-    model: Sequential = create_model(True)
+    model: Sequential = create_model(is_high_performance=True)
     log.debug("Running model training")
     model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=10, batch_size=32)
     log.debug("Training complete!")
