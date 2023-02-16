@@ -39,7 +39,6 @@ def receive_training_data():
     # log.debug(incoming_data_raw)
 
     global train_df, test_df, totalLength
-    LEARNING_TRIGGER = 100
 
     (train_df, test_df) = DS.receive_training_data_service(train_df, test_df, data)
     log.debug("Received Data Successfully")
