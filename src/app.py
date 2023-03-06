@@ -1,9 +1,9 @@
 import logging
-
+import sys
 # Local Packages Import
 from Service import DataService as DS
 from Service import TensorService as TS
-from Utilities.Constants import LEARNING_TRIGGER
+from Utilities.Constants import LEARNING_TRIGGER, WINDOWS, MODEL_PATH_LINUX, MODEL_PATH_WINDOWS
 
 # Web Server Imports
 import requests
@@ -30,6 +30,8 @@ totalLength = len(train_df) + len(test_df)
 # train_df = pd.DataFrame()
 # test_df = pd.DataFrame()
 
+totalLength = len(train_df) + len(test_df)
+
 @app.route("/train", methods=[POST])
 def receive_training_data():
     log.debug("================================================================")
@@ -46,12 +48,17 @@ def receive_training_data():
     # trigger training based on condition like loop counter or simply schedule daily training
     updatedLength = len(train_df) + len(test_df)
     log.debug("Updated Length = {}".format(updatedLength))
-    if (updatedLength - totalLength >= LEARNING_TRIGGER) :
-        log.debug("We have collected an additional {} samples, starting training now".format(LEARNING_TRIGGER))
-        x_train, y_train, x_test, y_test = DS.generate_mnist_tuples(train_df, test_df)
-        TS.model_service(x_train, y_train, x_test, y_test)
-        send_model()
-        totalLength = updatedLength
+
+    log.debug("Simulating training")
+    log.debug("Training complete!")
+    send_model()
+
+    # if (updatedLength - totalLength >= LEARNING_TRIGGER) :
+    #     log.debug("We have collected an additional {} samples, starting training now".format(LEARNING_TRIGGER))
+    #     x_train, y_train, x_test, y_test = DS.generate_mnist_tuples(train_df, test_df)
+    #     TS.model_service(x_train, y_train, x_test, y_test)
+    #     send_model()
+    #     totalLength = updatedLength
     log.debug("================================================================")
 
     return jsonify(
@@ -63,12 +70,18 @@ def receive_training_data():
 
 # temporary method to send model to zephyr server
 def send_model():
-    test_file = open(r"..\resources\model.cpp", "rb")
+    log.debug("Sending model to target server")
+    current_platform = sys.platform
+    if (current_platform == WINDOWS):
+        MODEL_PATH = MODEL_PATH_WINDOWS
+    else:
+        MODEL_PATH = MODEL_PATH_LINUX
+    test_file = open(MODEL_PATH, "rb")
     BASE_URL = "http://localhost:8081/retrieve_model"
     test_response = requests.post(BASE_URL, files={"model": test_file})
+    log.debug("POST Status from Zephyr Server = {}".format(test_response.status_code))
     test_file.close()
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080, debug=True)
-    # send_model()
+    app.run(host='0.0.0.0', port=8080)
 
